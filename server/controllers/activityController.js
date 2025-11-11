@@ -4,9 +4,9 @@ import { ObjectId } from "mongodb";
 // List activities with simple filtering and search
 export const getActivities = async (req, res) => {
   try {
-    console.log("📋 Getting activities...");
+    console.log("Getting activities...");
     const collection = await getActivityCollection();
-    console.log("✅ Collection obtained");
+    console.log(" Collection obtained");
 
     const { search, category, location } = req.query;
     const filter = {};
@@ -23,14 +23,14 @@ export const getActivities = async (req, res) => {
       ];
     }
 
-    console.log("🔍 Filter:", JSON.stringify(filter));
+    console.log("Filter:", JSON.stringify(filter));
     // Return all matching activities (no pagination)
     const activities = await collection.find(filter).sort({ createdAt: -1 }).toArray();
-    console.log(`📊 Found ${activities.length} activities`);
+    console.log(`Found ${activities.length} activities`);
 
     res.status(200).json({ data: activities, total: activities.length });
   } catch (error) {
-    console.error("❌ Error fetching activities:", error);
+    console.error("Error fetching activities:", error);
     res.status(500).json({ message: "Error fetching activities", error: error.message });
   }
 };

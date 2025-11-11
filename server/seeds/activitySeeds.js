@@ -9,7 +9,7 @@ export const activitySeeds = [
     ],
     collectedMoney: 15000000,
     collectedVolunteer: 45,
-    category: "disaster-relief",
+    category: "disaster-relief", //nnti gnti bencana/bansos
     targetMoney: 50000000,
     listVolunteer: [],
     createdAt: new Date("2024-11-01"),

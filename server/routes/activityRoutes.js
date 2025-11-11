@@ -18,19 +18,19 @@ import {
 const router = express.Router();
 
 // Activities collection
-router.get("/activities", getActivities); // done
-router.post("/activities", validate(validateActivityPayload), createActivity); //done
+router.get("/", getActivities); // done
+router.post("/", validate(validateActivityPayload), createActivity); //done
 
 // Single activity
-router.get("/activities/:id", getActivityById); //done
-router.put("/activities/:id", updateActivity);
-router.delete("/activities/:id", deleteActivity);
+router.get("/:id", getActivityById); //done
+router.put("/:id", updateActivity); // done
+router.delete("/:id", deleteActivity); // done
 
 // Volunteers
-router.post("/activities/:id/volunteer", validate(validateVolunteerPayload), registerVolunteer);
-router.delete("/activities/:id/volunteer/:volunteerId", unregisterVolunteer);
+router.post("/:id/volunteer", validate(validateVolunteerPayload), registerVolunteer); //done
+router.delete("/:id/volunteer/:volunteerId", unregisterVolunteer); //done
 
 // Donations
-router.post("/activities/:id/donation", addDonation);
+router.post("/:id/donation", addDonation); //done
 
 export default router;

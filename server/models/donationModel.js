@@ -1,6 +1,6 @@
 import { connectDB } from "../config/database.js";
 
-export async function getDonationCollection() {
+export const getDonationCollection = async () => {
   const db = await connectDB();
   return db.collection("donations");
-}
+};

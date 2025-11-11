@@ -46,5 +46,8 @@ export const errorHandler = (err, req, res, next) => {
   console.error("Error:", err);
   const status = err.status || 500;
   const message = err.message || "Internal server error";
+
+  // Optionally log the error details to a file or monitoring service here
+  // For example: logErrorToFile(err);
   res.status(status).json({ message, error: err });
 };
