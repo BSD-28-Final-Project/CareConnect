@@ -40,11 +40,15 @@ export const createActivity = async (req, res) => {
   try {
     const payload = req.body;
     const collection = await getActivityCollection();
-    
+
     const newActivity = {
       title: payload.title,
       description: payload.description,
-      location: payload.location || "",
+      location: payload.location ? {
+        name: payload.location.name || "",
+        lat: payload.location.lat || null,
+        lng: payload.location.lng || null,
+      } : null,
       images: Array.isArray(payload.images) ? payload.images : [],
       collectedMoney: payload.collectedMoney || 0,
       collectedVolunteer: payload.collectedVolunteer || 0,
@@ -94,7 +98,17 @@ export const updateActivity = async (req, res) => {
     const payload = req.body || {};
     // optional: validate payload partially
     const collection = await getActivityCollection();
-    const update = { ...payload, updatedAt: new Date() };
+    const update = {
+      ...payload,
+      ...(payload.location && {
+        location: {
+          name: payload.location.name || "",
+          lat: payload.location.lat || null,
+          lng: payload.location.lng || null,
+        },
+      }),
+      updatedAt: new Date(),
+    };
 
     const result = await collection.findOneAndUpdate(
       { _id: new ObjectId(id) },
@@ -157,7 +171,7 @@ export const registerVolunteer = async (req, res) => {
 
     const result = await collection.findOneAndUpdate(
       { _id: new ObjectId(id) },
-      { 
+      {
         $push: { listVolunteer: volunteer },
         $inc: { collectedVolunteer: 1 },
         $set: { updatedAt: new Date() }
@@ -182,13 +196,13 @@ export const unregisterVolunteer = async (req, res) => {
       return res.status(400).json({ message: "Invalid id(s)" });
 
     const collection = await getActivityCollection();
-    
+
     // First check if volunteer exists
     const activity = await collection.findOne({
       _id: new ObjectId(id),
       "listVolunteer._id": new ObjectId(volunteerId)
     });
-    
+
     if (!activity) {
       return res.status(404).json({ message: "Activity or volunteer not found" });
     }
@@ -196,9 +210,9 @@ export const unregisterVolunteer = async (req, res) => {
     // Remove volunteer and decrement counter (prevent negative)
     const result = await collection.findOneAndUpdate(
       { _id: new ObjectId(id) },
-      { 
+      {
         $pull: { listVolunteer: { _id: new ObjectId(volunteerId) } },
-        $set: { 
+        $set: {
           collectedVolunteer: Math.max(0, (activity.collectedVolunteer || 1) - 1),
           updatedAt: new Date()
         }
@@ -220,14 +234,14 @@ export const addDonation = async (req, res) => {
   try {
     const { id } = req.params;
     if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid activity id" });
-    
+
     const { amount } = req.body;
     if (!amount || amount <= 0) return res.status(400).json({ message: "Valid amount is required" });
 
     const collection = await getActivityCollection();
     const result = await collection.findOneAndUpdate(
       { _id: new ObjectId(id) },
-      { 
+      {
         $inc: { collectedMoney: amount },
         $set: { updatedAt: new Date() }
       },
