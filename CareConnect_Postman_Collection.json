@@ -1,0 +1,753 @@
+{
+  "info": {
+    "name": "CareConnect API",
+    "description": "Complete API collection for CareConnect platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "activity_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "volunteer_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "donation_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "expense_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "news_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"user\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/register",
+              "host": ["{{base_url}}"],
+              "path": ["users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    pm.collectionVariables.set('user_id', jsonData.user.id);",
+                  "    console.log('Token saved:', jsonData.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/login",
+              "host": ["{{base_url}}"],
+              "path": ["users", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Smith\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"password123\",\n  \"newPassword\": \"newpassword456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Activities",
+      "item": [
+        {
+          "name": "Get All Activities",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/activities",
+              "host": ["{{base_url}}"],
+              "path": ["activities"]
+            }
+          }
+        },
+        {
+          "name": "Search Activities",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/activities?search=bantuan&category=Education&location=Jakarta",
+              "host": ["{{base_url}}"],
+              "path": ["activities"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "bantuan"
+                },
+                {
+                  "key": "category",
+                  "value": "Education"
+                },
+                {
+                  "key": "location",
+                  "value": "Jakarta"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Activity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('activity_id', jsonData.data._id);",
+                  "    console.log('Activity ID saved:', jsonData.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Bantuan Pendidikan Anak\",\n  \"description\": \"Program bantuan pendidikan untuk anak-anak kurang mampu\",\n  \"location\": \"Jakarta\",\n  \"category\": \"Education\",\n  \"targetMoney\": 10000000,\n  \"images\": [\"image1.jpg\", \"image2.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/activities",
+              "host": ["{{base_url}}"],
+              "path": ["activities"]
+            }
+          }
+        },
+        {
+          "name": "Get Activity by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/activities/{{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["activities", "{{activity_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Activity",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Activity Title\",\n  \"location\": \"Surabaya\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/activities/{{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["activities", "{{activity_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Activity",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/activities/{{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["activities", "{{activity_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Register as Volunteer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('volunteer_id', jsonData.volunteer._id);",
+                  "    console.log('Volunteer ID saved:', jsonData.volunteer._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"name\": \"Volunteer Name\",\n  \"phone\": \"08123456789\",\n  \"note\": \"Saya ingin membantu sebagai volunteer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/activities/{{activity_id}}/volunteer",
+              "host": ["{{base_url}}"],
+              "path": ["activities", "{{activity_id}}", "volunteer"]
+            }
+          }
+        },
+        {
+          "name": "Unregister Volunteer",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/activities/{{activity_id}}/volunteer/{{volunteer_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["activities", "{{activity_id}}", "volunteer", "{{volunteer_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Add Donation to Activity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/activities/{{activity_id}}/donation",
+              "host": ["{{base_url}}"],
+              "path": ["activities", "{{activity_id}}", "donation"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Donations",
+      "item": [
+        {
+          "name": "Create Donation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('donation_id', jsonData.donationId);",
+                  "    console.log('Donation ID saved:', jsonData.donationId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"activityId\": \"{{activity_id}}\",\n  \"amount\": 1000000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/donations",
+              "host": ["{{base_url}}"],
+              "path": ["donations"]
+            }
+          }
+        },
+        {
+          "name": "Get All Donations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/donations",
+              "host": ["{{base_url}}"],
+              "path": ["donations"]
+            }
+          }
+        },
+        {
+          "name": "Get Donations by Activity",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/donations?activityId={{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["donations"],
+              "query": [
+                {
+                  "key": "activityId",
+                  "value": "{{activity_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Donations by User",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/donations?userId={{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["donations"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{user_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Donation by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/donations/{{donation_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["donations", "{{donation_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Expenses",
+      "item": [
+        {
+          "name": "Create Expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('expense_id', jsonData.data._id);",
+                  "    console.log('Expense ID saved:', jsonData.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activityId\": \"{{activity_id}}\",\n  \"title\": \"Pembelian Buku Pelajaran\",\n  \"amount\": 5000000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/expenses",
+              "host": ["{{base_url}}"],
+              "path": ["expenses"]
+            }
+          }
+        },
+        {
+          "name": "Get All Expenses",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/expenses",
+              "host": ["{{base_url}}"],
+              "path": ["expenses"]
+            }
+          }
+        },
+        {
+          "name": "Get Expenses by Activity (History)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/expenses/activity/{{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["expenses", "activity", "{{activity_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Expenses by Activity Filter",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/expenses?activityId={{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["expenses"],
+              "query": [
+                {
+                  "key": "activityId",
+                  "value": "{{activity_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Expense by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/expenses/{{expense_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["expenses", "{{expense_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Expense",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Pembelian Buku dan Alat Tulis\",\n  \"amount\": 6000000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/expenses/{{expense_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["expenses", "{{expense_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Expense",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/expenses/{{expense_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["expenses", "{{expense_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "News",
+      "item": [
+        {
+          "name": "Create News",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('news_id', jsonData.data._id);",
+                  "    console.log('News ID saved:', jsonData.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activityId\": \"{{activity_id}}\",\n  \"title\": \"Update Distribusi Bantuan\",\n  \"content\": \"Hari ini tim relawan telah mendistribusikan bantuan ke 10 lokasi\",\n  \"images\": [\"image1.jpg\", \"image2.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/news",
+              "host": ["{{base_url}}"],
+              "path": ["news"]
+            }
+          }
+        },
+        {
+          "name": "Get All News",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/news",
+              "host": ["{{base_url}}"],
+              "path": ["news"]
+            }
+          }
+        },
+        {
+          "name": "Get Latest News",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/news/latest?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["news", "latest"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get News by Activity",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/news/activity/{{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["news", "activity", "{{activity_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get News by Activity Filter",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/news?activityId={{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["news"],
+              "query": [
+                {
+                  "key": "activityId",
+                  "value": "{{activity_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get News by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/news/{{news_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["news", "{{news_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update News",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Update Distribusi Bantuan - Minggu 2\",\n  \"content\": \"Update dengan informasi lebih lengkap tentang progress kegiatan\",\n  \"images\": [\"image1.jpg\", \"image2.jpg\", \"image3.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/news/{{news_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["news", "{{news_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete News",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/news/{{news_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["news", "{{news_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["health"]
+        }
+      }
+    }
+  ]
+}
