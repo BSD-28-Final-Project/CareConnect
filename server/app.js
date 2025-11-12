@@ -3,6 +3,7 @@ import cors from "cors"
 import dotenv from "dotenv"
 import { connectDB } from "./config/database.js"
 import route from "./routes/index.js"
+import { errorHandler } from "./middlewares/errorhandler.js"
 
 dotenv.config()
 
@@ -23,6 +24,9 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api", route)
+
+// Error handler middleware (must be last)
+app.use(errorHandler)
 
 // Start server after DB connection
 const startServer = async () => {
