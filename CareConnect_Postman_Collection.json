@@ -54,6 +54,21 @@
       "key": "news_id",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "subscription_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customer_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "payment_method_id",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -967,10 +982,10 @@
       ]
     },
     {
-      "name": "Subscription",
+      "name": "AutoCharge Subscription",
       "item": [
         {
-          "name": "Subscribe (Auto-Distribute to Lowest Collected Activity)",
+          "name": "Create Subscription (Recurring Monthly)",
           "event": [
             {
               "listen": "test",
@@ -978,9 +993,10 @@
                 "exec": [
                   "if (pm.response.code === 201 || pm.response.code === 200) {",
                   "    var jsonData = pm.response.json();",
-                  "    console.log('Subscription success');",
-                  "    console.log('Amount:', jsonData.amount);",
-                  "    console.log('Distributed to Activity:', jsonData.activityId);",
+                  "    console.log('Subscription Created');",
+                  "    console.log('Subscription ID:', jsonData.id);",
+                  "    console.log('Status:', jsonData.status);",
+                  "    console.log('Next Billing Cycle:', jsonData.nextBillingAt);",
                   "}"
                 ]
               }
@@ -1000,15 +1016,199 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 50000\n}"
+              "raw": "{\n  \"customerId\": \"{{customer_id}}\",\n  \"paymentMethodId\": \"{{payment_method_id}}\",\n  \"amount\": 50000,\n  \"interval\": \"MONTH\",\n  \"currency\": \"IDR\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/subscribe",
+              "raw": "{{base_url}}/subscriptions",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "subscribe"
+                "subscriptions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xendit Webhook Listener (Handle Auto Charge Callback)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    console.log('Webhook Received');",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('Event:', jsonData.event);",
+                  "    console.log('Payment ID:', jsonData.data?.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CALLBACK-TOKEN",
+                "value": "{{XENDIT_WEBHOOK_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"invoice.paid\",\n  \"data\": {\n    \"id\": \"inv-test-123\",\n    \"amount\": 50000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/webhook/xendit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "xendit"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Subscriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/subscriptions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subscriptions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Subscription by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/subscriptions/{{subscription_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscription_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancel Subscription",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  console.log('Subscription cancelled');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/subscriptions/{{subscription_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscription_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Simulate Webhook (Autocharge Success)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-callback-token",
+                "value": "your_webhook_token_here"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"invoice.paid\",\n  \"id\": \"{{subscription_id}}\",\n  \"amount\": 50000,\n  \"paid_at\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/subscriptions/webhook/xendit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subscriptions",
+                "webhook",
+                "xendit"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Simulate Webhook (Autocharge Failed)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-callback-token",
+                "value": "your_webhook_token_here"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"invoice.failed\",\n  \"id\": \"{{subscription_id}}\",\n  \"reason\": \"Card declined\",\n  \"failed_at\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/subscriptions/webhook/xendit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subscriptions",
+                "webhook",
+                "xendit"
               ]
             }
           }
