@@ -115,7 +115,10 @@ export async function createSubscription(req, res) {
 export async function getSubscriptionDetails(req, res) {
   try {
     const subs = await getSubscriptionCollection();
-    const data = await subs.findOne({ userId: req.user.id, active: true });
+    const data = await subs.findOne({ 
+      userId: new ObjectId(req.user.id), 
+      active: true 
+    });
     res.json(data || {});
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch details" });
@@ -128,14 +131,17 @@ export async function updateSubscriptionAmount(req, res) {
     const { newAmount } = req.body;
     const subs = await getSubscriptionCollection();
 
-    const current = await subs.findOne({ userId: req.user.id, active: true });
+    const current = await subs.findOne({ 
+      userId: new ObjectId(req.user.id), 
+      active: true 
+    });
 
     await xendit.RecurringPayment.update(current.subscriptionId, {
       amount: newAmount
     });
 
     await subs.updateOne(
-      { userId: req.user.id },
+      { userId: new ObjectId(req.user.id) },
       { $set: { amount: newAmount } }
     );
 
@@ -149,12 +155,15 @@ export async function updateSubscriptionAmount(req, res) {
 export async function cancelSubscription(req, res) {
   try {
     const subs = await getSubscriptionCollection();
-    const current = await subs.findOne({ userId: req.user.id, active: true });
+    const current = await subs.findOne({ 
+      userId: new ObjectId(req.user.id), 
+      active: true 
+    });
 
     await xendit.RecurringPayment.disable(current.subscriptionId);
 
     await subs.updateOne(
-      { userId: req.user.id },
+      { userId: new ObjectId(req.user.id) },
       { $set: { active: false } }
     );
 
