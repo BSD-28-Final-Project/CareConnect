@@ -433,28 +433,6 @@ See [API_COMPLETE_TESTING.md](./documentation/API_COMPLETE_TESTING.md) for all c
 }
 ```
 
----
-
-## 🚀 Deployment
-
-### Deploy to Heroku
-```bash
-# Login to Heroku
-heroku login
-
-# Create app
-heroku create careconnect-api
-
-# Set environment variables
-heroku config:set PORT=3000
-heroku config:set MONGO_URL=your_mongodb_url
-heroku config:set JWT_SECRET=your_secret
-
-# Deploy
-git push heroku main
-```
-
-### Deploy to Railway/Render
 1. Connect your GitHub repository
 2. Set environment variables in dashboard
 3. Deploy automatically on push

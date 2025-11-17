@@ -3,6 +3,7 @@ import {
   createDonation,
   getDonations,
   getDonationById,
+  handleXenditWebhook,
 } from "../controllers/donationController.js";
 
 const router = express.Router();
@@ -10,5 +11,8 @@ const router = express.Router();
 router.post("/", createDonation);
 router.get("/", getDonations);
 router.get("/:id", getDonationById);
+
+// Xendit webhook endpoint
+router.post("/webhook/xendit", handleXenditWebhook);
 
 export default router;
