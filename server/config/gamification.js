@@ -14,6 +14,7 @@ export const LEVELS = [
   { level: 6, name: "Champion", minPoints: 2000, maxPoints: Infinity, badge: "👑" },
 ];
 
+// Features achievements
 export const ACHIEVEMENTS = {
   FIRST_DONATION: {
     id: "first_donation",
