@@ -1,4 +1,5 @@
 import { getActivityCollection } from "../models/activityModel.js";
+import { processVolunteerPoints } from "./gamificationController.js";
 import { ObjectId } from "mongodb";
 
 // List activities with simple filtering and search
@@ -187,6 +188,9 @@ export const registerVolunteer = async (req, res) => {
     );
 
     if (!result) return res.status(404).json({ message: "Activity not found" });
+
+    // 🎮 Process gamification points
+    await processVolunteerPoints(userId);
 
     res.status(201).json({ message: "Registered as volunteer", volunteer });
   } catch (error) {

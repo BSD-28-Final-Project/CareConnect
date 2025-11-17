@@ -39,6 +39,10 @@ export const registerUser = async (req, res, next) => {
       password: hashed,
       role: role || "user",
       point: 0,
+      totalDonations: 0,
+      totalVolunteerActivities: 0,
+      achievements: [],
+      activityLog: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };

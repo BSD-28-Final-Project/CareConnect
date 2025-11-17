@@ -63,6 +63,14 @@ Platform untuk menghubungkan relawan dan donatur dengan kegiatan sosial yang mem
 - ✅ Image support for news
 - ✅ CRUD operations for news
 
+### Gamification System 🎮
+- ✅ Point system (donation & volunteer)
+- ✅ 6-level progression (Pemula → Champion)
+- ✅ Achievement system (5 achievements)
+- ✅ Leaderboard (by points, donations, volunteers)
+- ✅ Auto-trigger points on actions
+- ✅ Activity logging & history
+
 ---
 
 ### 🛠️ Tech Stack
@@ -320,7 +328,13 @@ curl -X POST http://localhost:3000/api/donations \
 - `PUT /api/news/:id` - Update news
 - `DELETE /api/news/:id` - Delete news
 
-**Total: 29 endpoints + 1 health check = 30 endpoints**
+### Gamification (4 endpoints) 🎮
+- `GET /api/gamification/profile/:userId` - Get user profile with level & stats
+- `GET /api/gamification/leaderboard` - Get leaderboard (points/donations/volunteers)
+- `GET /api/gamification/achievements` - Get all available achievements
+- `GET /api/gamification/achievements/:userId` - Get user achievements status
+
+**Total: 33 endpoints + 1 health check = 34 endpoints**
 
 ---
 
