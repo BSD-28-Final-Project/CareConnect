@@ -1031,6 +1031,107 @@
           ]
         }
       }
+    },
+    {
+      "name": "Gamification",
+      "item": [
+        {
+          "name": "Get User Gamification Profile",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/gamification/profile/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["gamification", "profile", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Leaderboard (by Points)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/gamification/leaderboard?type=points&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["gamification", "leaderboard"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "points"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Leaderboard (by Donations)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/gamification/leaderboard?type=donations&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["gamification", "leaderboard"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "donations"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Leaderboard (by Volunteers)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/gamification/leaderboard?type=volunteers&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["gamification", "leaderboard"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "volunteers"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Achievements",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/gamification/achievements",
+              "host": ["{{base_url}}"],
+              "path": ["gamification", "achievements"]
+            }
+          }
+        },
+        {
+          "name": "Get User Achievements Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/gamification/achievements/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["gamification", "achievements", "{{user_id}}"]
+            }
+          }
+        }
+      ]
     }
   ]
 }
