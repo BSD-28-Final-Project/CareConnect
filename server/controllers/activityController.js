@@ -12,7 +12,12 @@ export const getActivities = async (req, res) => {
     const filter = {};
 
     if (category) filter.category = category;
-    if (location) filter.location = { $regex: new RegExp(location, "i") };
+
+    if (location) {
+      filter["location.name"] = {
+        $regex: new RegExp(location, "i")
+      };
+    }
 
     if (search) {
       // simple text search across title and description
@@ -115,6 +120,8 @@ export const updateActivity = async (req, res) => {
       { $set: update },
       { returnDocument: "after" }
     );
+    // console.log("RESULT FINDONEANDUPDATE:", result);
+
 
     if (!result) return res.status(404).json({ message: "Activity not found" });
 
