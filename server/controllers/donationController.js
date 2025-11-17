@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getDonationCollection } from "../models/donationModel.js";
 import { getActivityCollection } from "../models/activityModel.js";
+import { processDonationPoints } from "./gamificationController.js";
 import { createRequire } from 'module';
 
 // Import Xendit using CommonJS require
@@ -202,6 +203,9 @@ export const handleXenditWebhook = async (req, res) => {
           $set: { updatedAt: new Date() },
         }
       );
+
+      // 🎮 Process gamification points
+      await processDonationPoints(donation.userId.toString(), paid_amount || donation.amount);
 
       console.log(`✅ Donation ${external_id} paid successfully`);
     } else if (status === "EXPIRED") {

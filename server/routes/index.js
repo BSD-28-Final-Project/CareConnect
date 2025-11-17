@@ -6,11 +6,13 @@ import donationRoutes from "./donationRoutes.js";
 import userRoutes from "./userRoutes.js";
 import expensesRoutes from "./expensesRoutes.js";
 import newsRoutes from "./newsRouter.js";
+import gamificationRoutes from "./gamificationRoutes.js";
 
 route.use("/activities", activityRoutes);
 route.use("/donations", donationRoutes);
 route.use("/users", userRoutes);
 route.use("/expenses", expensesRoutes);
 route.use("/news", newsRoutes);
+route.use("/gamification", gamificationRoutes);
 
 export default route;
