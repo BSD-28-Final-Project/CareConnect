@@ -76,8 +76,13 @@
             },
             "url": {
               "raw": "{{base_url}}/users/register",
-              "host": ["{{base_url}}"],
-              "path": ["users", "register"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "register"
+              ]
             }
           }
         },
@@ -112,8 +117,13 @@
             },
             "url": {
               "raw": "{{base_url}}/users/login",
-              "host": ["{{base_url}}"],
-              "path": ["users", "login"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
             }
           }
         },
@@ -129,8 +139,13 @@
             ],
             "url": {
               "raw": "{{base_url}}/users/profile",
-              "host": ["{{base_url}}"],
-              "path": ["users", "profile"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
             }
           }
         },
@@ -154,8 +169,13 @@
             },
             "url": {
               "raw": "{{base_url}}/users/profile",
-              "host": ["{{base_url}}"],
-              "path": ["users", "profile"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
             }
           }
         },
@@ -179,8 +199,13 @@
             },
             "url": {
               "raw": "{{base_url}}/users/profile",
-              "host": ["{{base_url}}"],
-              "path": ["users", "profile"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
             }
           }
         },
@@ -196,8 +221,13 @@
             ],
             "url": {
               "raw": "{{base_url}}/users/{{user_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["users", "{{user_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
             }
           }
         }
@@ -212,8 +242,12 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/activities",
-              "host": ["{{base_url}}"],
-              "path": ["activities"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "activities"
+              ]
             }
           }
         },
@@ -222,9 +256,13 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{base_url}}/activities?search=bantuan&category=Education&location=Jakarta",
-              "host": ["{{base_url}}"],
-              "path": ["activities"],
+              "raw": "{{base_url}}/activities?search=bantuan&category=Education&location.name=Jakarta",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "activities"
+              ],
               "query": [
                 {
                   "key": "search",
@@ -268,12 +306,16 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Bantuan Pendidikan Anak\",\n  \"description\": \"Program bantuan pendidikan untuk anak-anak kurang mampu\",\n  \"location\": \"Jakarta\",\n  \"category\": \"Education\",\n  \"targetMoney\": 10000000,\n  \"images\": [\"image1.jpg\", \"image2.jpg\"]\n}"
+              "raw": "{\n  \"title\": \"Bantuan Pendidikan Anak\",\n  \"description\": \"Program bantuan pendidikan untuk anak-anak kurang mampu\",\n  \"location\": {\n \"name\": \"Jakarta\",\n \"lat\": -6.2,\n \"lng\": 106.8\n },\n  \"category\": \"Education\",\n  \"targetMoney\": 10000000,\n  \"images\": [\"image1.jpg\", \"image2.jpg\"]\n}"
             },
             "url": {
               "raw": "{{base_url}}/activities",
-              "host": ["{{base_url}}"],
-              "path": ["activities"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "activities"
+              ]
             }
           }
         },
@@ -283,8 +325,13 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/activities/{{activity_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["activities", "{{activity_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "activities",
+                "{{activity_id}}"
+              ]
             }
           }
         },
@@ -300,12 +347,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated Activity Title\",\n  \"location\": \"Surabaya\"\n}"
+              "raw": "{\n  \"title\": \"Updated Activity Title\",\n  \"location\": {\n \"name\": \"Surabaya\",\n \"lat\": -7.25,\n \"lng\": 112.75\n }\n}"
             },
             "url": {
               "raw": "{{base_url}}/activities/{{activity_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["activities", "{{activity_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "activities",
+                "{{activity_id}}"
+              ]
             }
           }
         },
@@ -315,8 +367,13 @@
             "method": "DELETE",
             "url": {
               "raw": "{{base_url}}/activities/{{activity_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["activities", "{{activity_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "activities",
+                "{{activity_id}}"
+              ]
             }
           }
         },
@@ -350,8 +407,14 @@
             },
             "url": {
               "raw": "{{base_url}}/activities/{{activity_id}}/volunteer",
-              "host": ["{{base_url}}"],
-              "path": ["activities", "{{activity_id}}", "volunteer"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "activities",
+                "{{activity_id}}",
+                "volunteer"
+              ]
             }
           }
         },
@@ -361,8 +424,15 @@
             "method": "DELETE",
             "url": {
               "raw": "{{base_url}}/activities/{{activity_id}}/volunteer/{{volunteer_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["activities", "{{activity_id}}", "volunteer", "{{volunteer_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "activities",
+                "{{activity_id}}",
+                "volunteer",
+                "{{volunteer_id}}"
+              ]
             }
           }
         },
@@ -382,8 +452,14 @@
             },
             "url": {
               "raw": "{{base_url}}/activities/{{activity_id}}/donation",
-              "host": ["{{base_url}}"],
-              "path": ["activities", "{{activity_id}}", "donation"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "activities",
+                "{{activity_id}}",
+                "donation"
+              ]
             }
           }
         }
@@ -428,8 +504,12 @@
             },
             "url": {
               "raw": "{{base_url}}/donations",
-              "host": ["{{base_url}}"],
-              "path": ["donations"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "donations"
+              ]
             }
           }
         },
@@ -439,8 +519,12 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/donations",
-              "host": ["{{base_url}}"],
-              "path": ["donations"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "donations"
+              ]
             }
           }
         },
@@ -450,8 +534,12 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/donations?activityId={{activity_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["donations"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "donations"
+              ],
               "query": [
                 {
                   "key": "activityId",
@@ -467,8 +555,12 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/donations?userId={{user_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["donations"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "donations"
+              ],
               "query": [
                 {
                   "key": "userId",
@@ -484,8 +576,13 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/donations/{{donation_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["donations", "{{donation_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "donations",
+                "{{donation_id}}"
+              ]
             }
           }
         },
@@ -524,8 +621,14 @@
             },
             "url": {
               "raw": "{{base_url}}/donations/webhook/xendit",
-              "host": ["{{base_url}}"],
-              "path": ["donations", "webhook", "xendit"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "donations",
+                "webhook",
+                "xendit"
+              ]
             }
           }
         }
@@ -564,8 +667,12 @@
             },
             "url": {
               "raw": "{{base_url}}/expenses",
-              "host": ["{{base_url}}"],
-              "path": ["expenses"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "expenses"
+              ]
             }
           }
         },
@@ -575,8 +682,12 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/expenses",
-              "host": ["{{base_url}}"],
-              "path": ["expenses"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "expenses"
+              ]
             }
           }
         },
@@ -586,8 +697,14 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/expenses/activity/{{activity_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["expenses", "activity", "{{activity_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "expenses",
+                "activity",
+                "{{activity_id}}"
+              ]
             }
           }
         },
@@ -597,8 +714,12 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/expenses?activityId={{activity_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["expenses"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "expenses"
+              ],
               "query": [
                 {
                   "key": "activityId",
@@ -614,8 +735,13 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/expenses/{{expense_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["expenses", "{{expense_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "expenses",
+                "{{expense_id}}"
+              ]
             }
           }
         },
@@ -635,8 +761,13 @@
             },
             "url": {
               "raw": "{{base_url}}/expenses/{{expense_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["expenses", "{{expense_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "expenses",
+                "{{expense_id}}"
+              ]
             }
           }
         },
@@ -646,8 +777,13 @@
             "method": "DELETE",
             "url": {
               "raw": "{{base_url}}/expenses/{{expense_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["expenses", "{{expense_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "expenses",
+                "{{expense_id}}"
+              ]
             }
           }
         }
@@ -686,8 +822,12 @@
             },
             "url": {
               "raw": "{{base_url}}/news",
-              "host": ["{{base_url}}"],
-              "path": ["news"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "news"
+              ]
             }
           }
         },
@@ -697,8 +837,12 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/news",
-              "host": ["{{base_url}}"],
-              "path": ["news"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "news"
+              ]
             }
           }
         },
@@ -708,8 +852,13 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/news/latest?limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["news", "latest"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "news",
+                "latest"
+              ],
               "query": [
                 {
                   "key": "limit",
@@ -725,8 +874,14 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/news/activity/{{activity_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["news", "activity", "{{activity_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "news",
+                "activity",
+                "{{activity_id}}"
+              ]
             }
           }
         },
@@ -736,8 +891,12 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/news?activityId={{activity_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["news"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "news"
+              ],
               "query": [
                 {
                   "key": "activityId",
@@ -753,8 +912,13 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/news/{{news_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["news", "{{news_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "news",
+                "{{news_id}}"
+              ]
             }
           }
         },
@@ -774,8 +938,13 @@
             },
             "url": {
               "raw": "{{base_url}}/news/{{news_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["news", "{{news_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "news",
+                "{{news_id}}"
+              ]
             }
           }
         },
@@ -785,8 +954,62 @@
             "method": "DELETE",
             "url": {
               "raw": "{{base_url}}/news/{{news_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["news", "{{news_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "news",
+                "{{news_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscription",
+      "item": [
+        {
+          "name": "Subscribe (Auto-Distribute to Lowest Collected Activity)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('Subscription success');",
+                  "    console.log('Amount:', jsonData.amount);",
+                  "    console.log('Distributed to Activity:', jsonData.activityId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/subscribe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subscribe"
+              ]
             }
           }
         }
@@ -799,9 +1022,13 @@
         "url": {
           "raw": "http://localhost:3000/health",
           "protocol": "http",
-          "host": ["localhost"],
+          "host": [
+            "localhost"
+          ],
           "port": "3000",
-          "path": ["health"]
+          "path": [
+            "health"
+          ]
         }
       }
     }
