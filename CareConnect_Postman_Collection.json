@@ -36,6 +36,16 @@
       "type": "string"
     },
     {
+      "key": "invoice_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invoice_url",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "expense_id",
       "value": "",
       "type": "string"
@@ -383,7 +393,7 @@
       "name": "Donations",
       "item": [
         {
-          "name": "Create Donation",
+          "name": "Create Donation (Xendit Payment)",
           "event": [
             {
               "listen": "test",
@@ -392,7 +402,13 @@
                   "if (pm.response.code === 201) {",
                   "    var jsonData = pm.response.json();",
                   "    pm.collectionVariables.set('donation_id', jsonData.donationId);",
-                  "    console.log('Donation ID saved:', jsonData.donationId);",
+                  "    pm.collectionVariables.set('invoice_url', jsonData.invoiceUrl);",
+                  "    pm.collectionVariables.set('invoice_id', jsonData.invoiceId);",
+                  "    console.log('✅ Donation created successfully!');",
+                  "    console.log('Donation ID:', jsonData.donationId);",
+                  "    console.log('💳 Payment URL:', jsonData.invoiceUrl);",
+                  "    console.log('Invoice ID:', jsonData.invoiceId);",
+                  "    console.log('Expires at:', jsonData.expiryDate);",
                   "}"
                 ]
               }
@@ -408,7 +424,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"activityId\": \"{{activity_id}}\",\n  \"amount\": 1000000\n}"
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"activityId\": \"{{activity_id}}\",\n  \"amount\": 50000,\n  \"payerEmail\": \"donor@example.com\",\n  \"description\": \"Donation for community activity\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/donations",
@@ -470,6 +486,46 @@
               "raw": "{{base_url}}/donations/{{donation_id}}",
               "host": ["{{base_url}}"],
               "path": ["donations", "{{donation_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Simulate Xendit Webhook (Test Payment)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    console.log('✅ Webhook processed successfully!');",
+                  "    console.log('Donation status updated to: success');",
+                  "    console.log('Activity collectedMoney updated');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-callback-token",
+                "value": "your_webhook_verification_token_here",
+                "description": "Replace with your actual webhook token from .env"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{invoice_id}}\",\n  \"external_id\": \"{{donation_id}}\",\n  \"status\": \"PAID\",\n  \"paid_amount\": 50000,\n  \"paid_at\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/donations/webhook/xendit",
+              "host": ["{{base_url}}"],
+              "path": ["donations", "webhook", "xendit"]
             }
           }
         }
