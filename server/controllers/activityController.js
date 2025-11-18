@@ -158,6 +158,12 @@ export const registerVolunteer = async (req, res) => {
     if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid activity id" });
 
     const { userId, name, phone, note } = req.body;
+
+    // 🔒 Authorization: User can only register themselves
+    if (req.user._id.toString() !== userId) {
+      return res.status(403).json({ message: "You can only register yourself as a volunteer" });
+    }
+
     const collection = await getActivityCollection();
 
     // prevent duplicate registration by same user
@@ -216,6 +222,12 @@ export const unregisterVolunteer = async (req, res) => {
 
     if (!activity) {
       return res.status(404).json({ message: "Activity or volunteer not found" });
+    }
+
+    // 🔒 Authorization: User can only unregister themselves (unless admin)
+    const volunteer = activity.listVolunteer.find(v => v._id.toString() === volunteerId);
+    if (req.user.role !== 'admin' && volunteer.userId !== req.user._id.toString()) {
+      return res.status(403).json({ message: "You can only unregister yourself" });
     }
 
     // Remove volunteer and decrement counter (prevent negative)

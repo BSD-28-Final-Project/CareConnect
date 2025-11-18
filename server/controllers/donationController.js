@@ -28,6 +28,11 @@ export const createDonation = async (req, res) => {
     if (!ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid userId" });
     }
+
+    // 🔒 Authorization: User can only create donation for themselves
+    if (req.user._id.toString() !== userId) {
+      return res.status(403).json({ message: "You can only create donations for yourself" });
+    }
     if (!amount || amount <= 0) {
       return res.status(400).json({ message: "Donation amount must be greater than 0" });
     }
@@ -121,10 +126,18 @@ export const getDonations = async (req, res) => {
     const donations = await getDonationCollection();
 
     const filter = {};
+    
+    // 🔒 Authorization: Non-admin users can only see their own donations
+    if (req.user.role !== 'admin') {
+      filter.userId = new ObjectId(req.user._id);
+    } else {
+      // Admin can filter by any userId or activityId
+      if (userId && ObjectId.isValid(userId))
+        filter.userId = new ObjectId(userId);
+    }
+    
     if (activityId && ObjectId.isValid(activityId))
       filter.activityId = new ObjectId(activityId);
-    if (userId && ObjectId.isValid(userId))
-      filter.userId = new ObjectId(userId);
 
     const list = await donations.find(filter).sort({ createdAt: -1 }).toArray();
 
@@ -148,6 +161,11 @@ export const getDonationById = async (req, res) => {
     const donation = await donations.findOne({ _id: new ObjectId(id) });
 
     if (!donation) return res.status(404).json({ message: "Donation not found" });
+
+    // 🔒 Authorization: User can only view their own donation (unless admin)
+    if (req.user.role !== 'admin' && donation.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "You can only view your own donations" });
+    }
 
     res.status(200).json({ data: donation });
   } catch (error) {

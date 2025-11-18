@@ -9,11 +9,12 @@ import { authenticate } from "../middlewares/authentication.js";
 
 const router = express.Router();
 
-router.post("/", createDonation);
-router.get("/", getDonations);
-router.get("/:id", getDonationById);
-
-// Xendit webhook endpoint
+// Public route - Xendit webhook callback
 router.post("/webhook/xendit", handleXenditWebhook);
+
+// Protected routes - Must be authenticated
+router.post("/", authenticate, createDonation);
+router.get("/", authenticate, getDonations);
+router.get("/:id", authenticate, getDonationById);
 
 export default router;

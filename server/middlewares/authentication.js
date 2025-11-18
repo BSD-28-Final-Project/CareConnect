@@ -21,7 +21,7 @@ export const authenticate = (req, res, next) => {
     
     // Add user info to request
     req.user = {
-      id: decoded.id,
+      _id: decoded._id || decoded.id,  // Support both formats
       email: decoded.email,
       role: decoded.role
     };
@@ -50,7 +50,7 @@ export const isAdmin = (req, res, next) => {
 export const isAuthorized = (req, res, next) => {
   const userId = req.params.id || req.params.userId;
   
-  if (req.user.role === "admin" || req.user.id === userId) {
+  if (req.user.role === "admin" || req.user._id === userId) {
     return next();
   }
   
