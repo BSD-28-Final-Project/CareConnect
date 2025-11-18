@@ -5,6 +5,7 @@ import {
   getDonationById,
   handleXenditWebhook,
 } from "../controllers/donationController.js";
+import { authenticate } from "../middlewares/authentication.js";
 
 const router = express.Router();
 
