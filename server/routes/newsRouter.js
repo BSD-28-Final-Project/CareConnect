@@ -8,20 +8,19 @@ import {
   updateNews,
   deleteNews,
 } from "../controllers/newsController.js";
+import { authenticate, isAdmin } from "../middlewares/authentication.js";
 
 const router = express.Router();
 
-// General news routes
-router.post("/", createNews);                       // Create news
-router.get("/", getAllNews);                        // Get all news (with optional filter)
-router.get("/latest", getLatestNews);               // Get latest news
+// Public routes - Anyone can read news
+router.get("/", getAllNews);
+router.get("/latest", getLatestNews);
+router.get("/activity/:activityId", getNewsByActivity);
+router.get("/:id", getNewsById);
 
-// Specific news routes
-router.get("/:id", getNewsById);                    // Get news by ID
-router.put("/:id", updateNews);                     // Update news
-router.delete("/:id", deleteNews);                  // Delete news
-
-// Activity-specific news routes
-router.get("/activity/:activityId", getNewsByActivity);  // Get news by activity
+// Protected routes - Only authenticated users can manage news
+router.post("/", authenticate, createNews);
+router.put("/:id", authenticate, isAdmin, updateNews);
+router.delete("/:id", authenticate, isAdmin, deleteNews); // Admin only
 
 export default router;

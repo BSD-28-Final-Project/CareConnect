@@ -7,19 +7,18 @@ import {
   updateExpense,
   deleteExpense,
 } from "../controllers/expenseController.js";
+import { authenticate, isAdmin } from "../middlewares/authentication.js";
 
 const router = express.Router();
 
-// General expense routes
-router.post("/", createExpense);                    // Create expense
-router.get("/", getExpenses);                       // Get all expenses (with optional filter)
+// Public routes - Transparency (anyone can view expenses)
+router.get("/", getExpenses);
+router.get("/activity/:activityId", getExpensesByActivity);
+router.get("/:id", getExpenseById);
 
-// Specific expense routes
-router.get("/:id", getExpenseById);                 // Get expense by ID
-router.put("/:id", updateExpense);                  // Update expense
-router.delete("/:id", deleteExpense);               // Delete expense
-
-// Activity-specific expense routes
-router.get("/activity/:activityId", getExpensesByActivity);  // Get expenses by activity
+// Protected routes - Only authenticated users can manage expenses
+router.post("/", authenticate, createExpense);
+router.put("/:id", authenticate, isAdmin, updateExpense);
+router.delete("/:id", authenticate, isAdmin, deleteExpense); // Admin only
 
 export default router;

@@ -20,6 +20,11 @@ export const getUserGamificationProfile = async (req, res) => {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
+    // 🔒 Authorization: User can only view their own profile (unless admin)
+    if (req.user.role !== 'admin' && req.user._id.toString() !== userId) {
+      return res.status(403).json({ message: "You can only view your own gamification profile" });
+    }
+
     const collection = await getUserCollection();
     const user = await collection.findOne({ _id: new ObjectId(userId) });
 
@@ -152,6 +157,11 @@ export const getUserAchievements = async (req, res) => {
 
     if (!ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    // 🔒 Authorization: User can only view their own achievements (unless admin)
+    if (req.user.role !== 'admin' && req.user._id.toString() !== userId) {
+      return res.status(403).json({ message: "You can only view your own achievements" });
     }
 
     const collection = await getUserCollection();

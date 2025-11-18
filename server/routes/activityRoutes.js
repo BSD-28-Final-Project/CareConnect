@@ -14,21 +14,22 @@ import {
   validateActivityPayload,
   validateVolunteerPayload,
 } from "../middlewares/errorhandler.js";
+import { authenticate, isAdmin } from "../middlewares/authentication.js";
 
 const router = express.Router();
 
-// Activities collection
-router.get("/", getActivities); // done
-router.post("/", validate(validateActivityPayload), createActivity); //done
+// Public routes
+router.get("/", getActivities); // Anyone can browse activities
+router.get("/:id", getActivityById); // Anyone can view activity details
 
-// Single activity
-router.get("/:id", getActivityById); //done
-router.put("/:id", updateActivity); // done
-router.delete("/:id", deleteActivity); // done
+// Protected routes - Must be authenticated
+router.post("/", authenticate, isAdmin, validate(validateActivityPayload), createActivity);
+router.put("/:id", authenticate, isAdmin, updateActivity);
+router.delete("/:id", authenticate, isAdmin, deleteActivity); // Admin only
 
-// Volunteers
-router.post("/:id/volunteer", validate(validateVolunteerPayload), registerVolunteer); //done
-router.delete("/:id/volunteer/:volunteerId", unregisterVolunteer); //done
+// Volunteer routes - Must be authenticated
+router.post("/:id/volunteer", authenticate, validate(validateVolunteerPayload), registerVolunteer);
+router.delete("/:id/volunteer/:volunteerId", authenticate, unregisterVolunteer);
 
 // Donations
 router.post("/:id/donation", addDonation); //done

@@ -5,19 +5,16 @@ import {
   getAllAchievements,
   getUserAchievements,
 } from "../controllers/gamificationController.js";
+import { authenticate } from "../middlewares/authentication.js";
 
 const router = express.Router();
 
-// GET user gamification profile
-router.get("/profile/:userId", getUserGamificationProfile);
-
-// GET leaderboard (query: ?type=points|donations|volunteers&limit=100)
+// Public routes - Transparency & engagement
 router.get("/leaderboard", getLeaderboard);
-
-// GET all available achievements
 router.get("/achievements", getAllAchievements);
 
-// GET user achievements status
-router.get("/achievements/:userId", getUserAchievements);
+// Protected routes - User-specific data
+router.get("/profile/:userId", authenticate, getUserGamificationProfile);
+router.get("/achievements/:userId", authenticate, getUserAchievements);
 
 export default router;
