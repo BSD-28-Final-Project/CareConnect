@@ -515,3 +515,184 @@ describe('Donation Controller - Additional Coverage', () => {
     expect(response.body.data).toHaveLength(0);
   });
 });
+
+describe('Donation Controller - Xendit Webhook', () => {
+  let testDonation;
+
+  beforeEach(async () => {
+    // Create a test donation for webhook processing
+    const donations = db.collection('donations');
+    const donationResult = await donations.insertOne({
+      userId: new ObjectId(userId),
+      activityId: new ObjectId(activityId),
+      amount: 100000,
+      status: 'pending',
+      payerEmail: 'donor@example.com',
+      description: 'Test webhook donation',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    testDonation = {
+      _id: donationResult.insertedId,
+      amount: 100000
+    };
+  });
+
+  test('should process PAID webhook successfully', async () => {
+    const webhookPayload = {
+      external_id: testDonation._id.toString(),
+      status: 'PAID',
+      id: 'invoice_test_123',
+      paid_amount: 100000
+    };
+
+    const response = await request(app)
+      .post('/api/donations/webhook/xendit')
+      .set('x-callback-token', process.env.XENDIT_WEBHOOK_TOKEN || 'test-webhook-token')
+      .send(webhookPayload);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('Webhook processed successfully');
+
+    // Verify donation status updated
+    const donations = db.collection('donations');
+    const donation = await donations.findOne({ _id: testDonation._id });
+    expect(donation.status).toBe('success');
+    expect(donation).toHaveProperty('paidAt');
+
+    // Verify activity collectedMoney updated
+    const activities = db.collection('activities');
+    const activity = await activities.findOne({ _id: new ObjectId(activityId) });
+    expect(activity.collectedMoney).toBe(100000);
+  });
+
+  test('should process SETTLED webhook successfully', async () => {
+    const webhookPayload = {
+      external_id: testDonation._id.toString(),
+      status: 'SETTLED',
+      id: 'invoice_test_456',
+      paid_amount: 100000
+    };
+
+    const response = await request(app)
+      .post('/api/donations/webhook/xendit')
+      .set('x-callback-token', process.env.XENDIT_WEBHOOK_TOKEN || 'test-webhook-token')
+      .send(webhookPayload);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('Webhook processed successfully');
+
+    // Verify donation status updated
+    const donations = db.collection('donations');
+    const donation = await donations.findOne({ _id: testDonation._id });
+    expect(donation.status).toBe('success');
+  });
+
+  test('should process EXPIRED webhook successfully', async () => {
+    const webhookPayload = {
+      external_id: testDonation._id.toString(),
+      status: 'EXPIRED',
+      id: 'invoice_test_789'
+    };
+
+    const response = await request(app)
+      .post('/api/donations/webhook/xendit')
+      .set('x-callback-token', process.env.XENDIT_WEBHOOK_TOKEN || 'test-webhook-token')
+      .send(webhookPayload);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('Webhook processed successfully');
+
+    // Verify donation status updated to expired
+    const donations = db.collection('donations');
+    const donation = await donations.findOne({ _id: testDonation._id });
+    expect(donation.status).toBe('expired');
+
+    // Verify activity collectedMoney NOT updated for expired
+    const activities = db.collection('activities');
+    const activity = await activities.findOne({ _id: new ObjectId(activityId) });
+    expect(activity.collectedMoney).toBe(0);
+  });
+
+  test('should reject webhook with invalid token', async () => {
+    const webhookPayload = {
+      external_id: testDonation._id.toString(),
+      status: 'PAID',
+      id: 'invoice_test_invalid',
+      paid_amount: 100000
+    };
+
+    const response = await request(app)
+      .post('/api/donations/webhook/xendit')
+      .set('x-callback-token', 'invalid-token')
+      .send(webhookPayload);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBe('Unauthorized webhook');
+
+    // Verify donation status NOT updated
+    const donations = db.collection('donations');
+    const donation = await donations.findOne({ _id: testDonation._id });
+    expect(donation.status).toBe('pending');
+  });
+
+  test('should return 404 when donation not found', async () => {
+    const fakeId = new ObjectId().toString();
+    const webhookPayload = {
+      external_id: fakeId,
+      status: 'PAID',
+      id: 'invoice_test_notfound',
+      paid_amount: 100000
+    };
+
+    const response = await request(app)
+      .post('/api/donations/webhook/xendit')
+      .set('x-callback-token', process.env.XENDIT_WEBHOOK_TOKEN || 'test-webhook-token')
+      .send(webhookPayload);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe('Donation not found');
+  });
+
+  test('should handle webhook with paid_amount different from donation amount', async () => {
+    const webhookPayload = {
+      external_id: testDonation._id.toString(),
+      status: 'PAID',
+      id: 'invoice_test_diffamount',
+      paid_amount: 150000 // Different from original 100000
+    };
+
+    const response = await request(app)
+      .post('/api/donations/webhook/xendit')
+      .set('x-callback-token', process.env.XENDIT_WEBHOOK_TOKEN || 'test-webhook-token')
+      .send(webhookPayload);
+
+    expect(response.status).toBe(200);
+
+    // Verify activity collectedMoney uses paid_amount
+    const activities = db.collection('activities');
+    const activity = await activities.findOne({ _id: new ObjectId(activityId) });
+    expect(activity.collectedMoney).toBe(150000);
+  });
+
+  test('should handle webhook without paid_amount field', async () => {
+    const webhookPayload = {
+      external_id: testDonation._id.toString(),
+      status: 'PAID',
+      id: 'invoice_test_nopaid'
+      // No paid_amount field
+    };
+
+    const response = await request(app)
+      .post('/api/donations/webhook/xendit')
+      .set('x-callback-token', process.env.XENDIT_WEBHOOK_TOKEN || 'test-webhook-token')
+      .send(webhookPayload);
+
+    expect(response.status).toBe(200);
+
+    // Verify activity collectedMoney uses donation.amount
+    const activities = db.collection('activities');
+    const activity = await activities.findOne({ _id: new ObjectId(activityId) });
+    expect(activity.collectedMoney).toBe(testDonation.amount);
+  });
+});

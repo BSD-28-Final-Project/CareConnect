@@ -41,5 +41,6 @@ const startServer = async () => {
 
 app.listen(process.env.PORT, startServer);
 
+export default app;
 
 
