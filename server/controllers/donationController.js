@@ -85,7 +85,7 @@ export const createDonation = async (req, res) => {
     };
 
     const xenditInvoice = await xendit.Invoice.createInvoice({ data: invoiceData });
-    
+
     // Debug: log Xendit response structure
     console.log("Xendit Invoice Response:", JSON.stringify(xenditInvoice, null, 2));
 
@@ -110,9 +110,9 @@ export const createDonation = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating donation:", error);
-    res.status(500).json({ 
-      message: "Error creating donation", 
-      error: error.message 
+    res.status(500).json({
+      message: "Error creating donation",
+      error: error.message
     });
   }
 };
@@ -120,26 +120,80 @@ export const createDonation = async (req, res) => {
 /**
  * GET ALL DONATIONS (optional filter by activity or user)
  */
+/**
+ * GET ALL DONATIONS (with activity details via lookup)
+ */
 export const getDonations = async (req, res) => {
   try {
     const { activityId, userId } = req.query;
     const donations = await getDonationCollection();
 
-    const filter = {};
-    
+    const matchFilter = {};
+
     // 🔒 Authorization: Non-admin users can only see their own donations
     if (req.user.role !== 'admin') {
-      filter.userId = new ObjectId(req.user._id);
+      matchFilter.userId = new ObjectId(req.user._id);
     } else {
       // Admin can filter by any userId or activityId
       if (userId && ObjectId.isValid(userId))
-        filter.userId = new ObjectId(userId);
+        matchFilter.userId = new ObjectId(userId);
     }
-    
-    if (activityId && ObjectId.isValid(activityId))
-      filter.activityId = new ObjectId(activityId);
 
-    const list = await donations.find(filter).sort({ createdAt: -1 }).toArray();
+    if (activityId && ObjectId.isValid(activityId))
+      matchFilter.activityId = new ObjectId(activityId);
+
+    // 🔗 Use aggregation with $lookup to join with activities
+    const list = await donations.aggregate([
+      // Stage 1: Match filter (where clause)
+      { $match: matchFilter },
+
+      // Stage 2: Lookup (join) with activities collection
+      {
+        $lookup: {
+          from: "activities",           // Collection to join
+          localField: "activityId",      // Field in donations
+          foreignField: "_id",           // Field in activities
+          as: "activityDetails"          // Output array field
+        }
+      },
+
+      // Stage 3: Unwind array (convert array to object)
+      {
+        $unwind: {
+          path: "$activityDetails",
+          preserveNullAndEmptyArrays: true  // Keep donations even if activity not found
+        }
+      },
+
+      // Stage 4: Project (select fields to return)
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          activityId: 1,
+          amount: 1,
+          status: 1,
+          paymentMethod: 1,
+          xenditInvoiceId: 1,
+          xenditInvoiceUrl: 1,
+          paidAt: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          // Add activity info
+          "activity": {
+            _id: "$activityDetails._id",
+            title: "$activityDetails.title",
+            description: "$activityDetails.description",
+            location: "$activityDetails.location",
+            category: "$activityDetails.category",
+            imageUrl: "$activityDetails.imageUrl"
+          }
+        }
+      },
+
+      // Stage 5: Sort by newest first
+      { $sort: { createdAt: -1 } }
+    ]).toArray();
 
     res.status(200).json({ data: list, total: list.length });
   } catch (error) {
@@ -181,7 +235,7 @@ export const getDonationById = async (req, res) => {
 export const handleXenditWebhook = async (req, res) => {
   try {
     const webhookToken = req.headers["x-callback-token"];
-    
+
     // Verify webhook token
     if (webhookToken !== process.env.XENDIT_WEBHOOK_TOKEN) {
       return res.status(401).json({ message: "Unauthorized webhook" });
@@ -194,7 +248,7 @@ export const handleXenditWebhook = async (req, res) => {
 
     // Find donation by external_id (donation ID)
     const donation = await donations.findOne({ _id: new ObjectId(external_id) });
-    
+
     if (!donation) {
       return res.status(404).json({ message: "Donation not found" });
     }
@@ -244,9 +298,9 @@ export const handleXenditWebhook = async (req, res) => {
     res.status(200).json({ message: "Webhook processed successfully" });
   } catch (error) {
     console.error("Error processing Xendit webhook:", error);
-    res.status(500).json({ 
-      message: "Error processing webhook", 
-      error: error.message 
+    res.status(500).json({
+      message: "Error processing webhook",
+      error: error.message
     });
   }
 };
