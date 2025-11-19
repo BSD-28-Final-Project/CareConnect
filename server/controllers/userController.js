@@ -110,7 +110,7 @@ export const loginUser = async (req, res, next) => {
 // Get user profile (own profile)
 export const getUserProfile = async (req, res, next) => {
   try {
-    const userId = req.user.id; // From JWT token
+    const userId = req.user._id; // From JWT token
     const collection = await getUserCollection();
     
     const { ObjectId } = await import("mongodb");
