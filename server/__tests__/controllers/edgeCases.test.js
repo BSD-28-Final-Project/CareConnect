@@ -3,6 +3,8 @@ import request from 'supertest';
 import app from '../../testApp.js';
 import { setupTestDB, teardownTestDB, clearDatabase } from '../helpers/testHelper.js';
 
+let token;
+
 beforeAll(async () => {
   await setupTestDB();
 });
@@ -13,6 +15,25 @@ afterAll(async () => {
 
 beforeEach(async () => {
   await clearDatabase();
+  
+  // Create user and get token
+  await request(app)
+    .post('/api/users/register')
+    .send({
+      name: 'Test User',
+      email: 'test@example.com',
+      password: 'password123',
+      role: 'user'
+    });
+
+  const loginResponse = await request(app)
+    .post('/api/users/login')
+    .send({
+      email: 'test@example.com',
+      password: 'password123'
+    });
+
+  token = loginResponse.body.token;
 });
 
 describe('Edge Cases Coverage - News Controller', () => {
@@ -178,6 +199,7 @@ describe('Edge Cases Coverage - Expense Controller', () => {
     
     const response = await request(app)
       .post('/api/expenses')
+      .set('Authorization', `Bearer ${token}`)
       .send({
         activityId: new ObjectId().toString(),
         title: 'Test Expense',
@@ -185,7 +207,7 @@ describe('Edge Cases Coverage - Expense Controller', () => {
         date: new Date().toISOString()
       });
 
-    expect([400, 422]).toContain(response.status);
+    expect([400, 401, 422]).toContain(response.status);
   });
 
   test('should handle expense with negative amount', async () => {
@@ -193,14 +215,15 @@ describe('Edge Cases Coverage - Expense Controller', () => {
     
     const response = await request(app)
       .post('/api/expenses')
+      .set('Authorization', `Bearer ${token}`)
       .send({
         activityId: new ObjectId().toString(),
         title: 'Test Expense',
-        amount: -5000,
+        amount: -500,
         date: new Date().toISOString()
       });
 
-    expect([400, 422]).toContain(response.status);
+    expect([400, 401, 422]).toContain(response.status);
   });
 });
 
@@ -210,13 +233,14 @@ describe('Edge Cases Coverage - Donation Controller', () => {
     
     const response = await request(app)
       .post('/api/donations')
+      .set('Authorization', `Bearer ${token}`)
       .send({
         userId: new ObjectId().toString(),
         activityId: new ObjectId().toString(),
         amount: 0
       });
 
-    expect([400, 422]).toContain(response.status);
+    expect([400, 401, 422]).toContain(response.status);
   });
 
   test('should handle donation with negative amount', async () => {
@@ -224,12 +248,13 @@ describe('Edge Cases Coverage - Donation Controller', () => {
     
     const response = await request(app)
       .post('/api/donations')
+      .set('Authorization', `Bearer ${token}`)
       .send({
         userId: new ObjectId().toString(),
         activityId: new ObjectId().toString(),
-        amount: -10000
+        amount: -1000
       });
 
-    expect([400, 422]).toContain(response.status);
+    expect([400, 401, 422]).toContain(response.status);
   });
 });

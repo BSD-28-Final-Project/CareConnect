@@ -8,7 +8,7 @@ process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret-key';
 describe('Authentication Middleware - authenticate', () => {
   test('should authenticate with valid token', () => {
     const token = jwt.sign(
-      { id: '123', email: 'test@example.com', role: 'user' },
+      { _id: '123', email: 'test@example.com', role: 'user' },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
@@ -25,7 +25,7 @@ describe('Authentication Middleware - authenticate', () => {
 
     expect(next).toHaveBeenCalled();
     expect(req.user).toBeDefined();
-    expect(req.user.id).toBe('123');
+    expect(req.user._id).toBe('123');
     expect(req.user.email).toBe('test@example.com');
     expect(req.user.role).toBe('user');
   });
@@ -147,7 +147,7 @@ describe('Authentication Middleware - isAdmin', () => {
 describe('Authentication Middleware - isAuthorized', () => {
   test('should allow admin to access any resource', () => {
     const req = {
-      user: { id: '123', email: 'admin@example.com', role: 'admin' },
+      user: { _id: '123', email: 'admin@example.com', role: 'admin' },
       params: { id: '456' }
     };
     const res = {};
@@ -160,10 +160,13 @@ describe('Authentication Middleware - isAuthorized', () => {
 
   test('should allow user to access their own resource', () => {
     const req = {
-      user: { id: '123', email: 'user@example.com', role: 'user' },
+      user: { _id: '123', email: 'user@example.com', role: 'user' },
       params: { id: '123' }
     };
-    const res = {};
+    const res = {
+      status: jest.fn(function() { return this; }),
+      json: jest.fn()
+    };
     const next = jest.fn();
 
     isAuthorized(req, res, next);
@@ -173,7 +176,7 @@ describe('Authentication Middleware - isAuthorized', () => {
 
   test('should deny user accessing others resource', () => {
     const req = {
-      user: { id: '123', email: 'user@example.com', role: 'user' },
+      user: { _id: '123', email: 'user@example.com', role: 'user' },
       params: { id: '456' }
     };
     const res = {

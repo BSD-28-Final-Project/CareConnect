@@ -117,7 +117,7 @@ describe('News Controller - Create News', () => {
     expect(response.body.data.images).toEqual([]);
   });
 
-  test('should create news without authentication (no auth required)', async () => {
+  test('should create news with authentication', async () => {
     const newsData = {
       activityId: activityId,
       title: 'Activity Update',
@@ -126,6 +126,7 @@ describe('News Controller - Create News', () => {
 
     const response = await request(app)
       .post('/api/news')
+      .set('Authorization', `Bearer ${token}`)
       .send(newsData)
       .expect(201);
 

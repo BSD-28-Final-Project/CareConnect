@@ -50,11 +50,7 @@ export const createActivity = async (req, res) => {
     const newActivity = {
       title: payload.title,
       description: payload.description,
-      location: payload.location ? {
-        name: payload.location.name || "",
-        lat: payload.location.lat || null,
-        lng: payload.location.lng || null,
-      } : null,
+      location: payload.location,
       images: Array.isArray(payload.images) ? payload.images : [],
       collectedMoney: payload.collectedMoney || 0,
       collectedVolunteer: payload.collectedVolunteer || 0,
@@ -106,13 +102,6 @@ export const updateActivity = async (req, res) => {
     const collection = await getActivityCollection();
     const update = {
       ...payload,
-      ...(payload.location && {
-        location: {
-          name: payload.location.name || "",
-          lat: payload.location.lat || null,
-          lng: payload.location.lng || null,
-        },
-      }),
       updatedAt: new Date(),
     };
 

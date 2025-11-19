@@ -7,6 +7,8 @@ import { ObjectId } from 'mongodb';
 let db;
 let token;
 let adminToken;
+let userId;
+let adminId;
 
 beforeAll(async () => {
   const testDb = await setupTestDB();
@@ -22,7 +24,7 @@ beforeEach(async () => {
   await clearDatabase();
   
   // Create regular user and get token
-  await request(app)
+  const userRegister = await request(app)
     .post('/api/users/register')
     .send({
       name: 'Regular User',
@@ -30,6 +32,8 @@ beforeEach(async () => {
       password: 'password123',
       role: 'user'
     });
+
+  userId = userRegister.body.userId;
 
   const userLogin = await request(app)
     .post('/api/users/login')
@@ -41,7 +45,7 @@ beforeEach(async () => {
   token = userLogin.body.token;
 
   // Create admin user and get token
-  await request(app)
+  const adminRegister = await request(app)
     .post('/api/users/register')
     .send({
       name: 'Admin User',
@@ -49,6 +53,8 @@ beforeEach(async () => {
       password: 'password123',
       role: 'admin'
     });
+
+  adminId = adminRegister.body.userId;
 
   const adminLogin = await request(app)
     .post('/api/users/login')
@@ -65,7 +71,7 @@ describe('Activity Controller - Create Activity', () => {
     const activityData = {
       title: 'Beach Cleanup',
       description: 'Clean the beach together',
-      location: 'Kuta Beach',
+      location: { name: 'Kuta Beach', address: 'Bali, Indonesia' },
       images: ['image1.jpg', 'image2.jpg'],
       category: 'environment',
       targetMoney: 10000000
@@ -340,9 +346,10 @@ describe('Activity Controller - Update Activity', () => {
     expect(activity.targetMoney).toBe(8000000);
   });
 
-  test('should update without authentication (no auth required)', async () => {
+  test('should update with admin authentication', async () => {
     const response = await request(app)
       .put(`/api/activities/${activityId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ title: 'Updated Title' })
       .expect(200);
 
@@ -407,9 +414,10 @@ describe('Activity Controller - Delete Activity', () => {
     expect(activity).toBeNull();
   });
 
-  test('should delete without authentication (no auth required)', async () => {
+  test('should delete with admin authentication', async () => {
     const response = await request(app)
       .delete(`/api/activities/${activityId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
     expect(response.body).toHaveProperty('message');
@@ -448,7 +456,7 @@ describe('Activity Controller - Register Volunteer', () => {
 
   test('should register volunteer successfully', async () => {
     const volunteerData = {
-      userId: '507f1f77bcf86cd799439011',
+      userId: userId,
       name: 'John Volunteer',
       phone: '08123456789',
       note: 'I want to help'
@@ -456,6 +464,7 @@ describe('Activity Controller - Register Volunteer', () => {
 
     const response = await request(app)
       .post(`/api/activities/${activityId}/volunteer`)
+      .set('Authorization', `Bearer ${token}`)
       .send(volunteerData)
       .expect(201);
 
@@ -467,12 +476,13 @@ describe('Activity Controller - Register Volunteer', () => {
 
   test('should register volunteer without optional fields', async () => {
     const volunteerData = {
-      userId: '507f1f77bcf86cd799439012',
+      userId: userId,
       name: 'Jane Volunteer'
     };
 
     const response = await request(app)
       .post(`/api/activities/${activityId}/volunteer`)
+      .set('Authorization', `Bearer ${token}`)
       .send(volunteerData)
       .expect(201);
 
@@ -482,19 +492,21 @@ describe('Activity Controller - Register Volunteer', () => {
 
   test('should return 409 for duplicate volunteer registration', async () => {
     const volunteerData = {
-      userId: '507f1f77bcf86cd799439011',
+      userId: userId,
       name: 'John Volunteer'
     };
 
     // First registration
     await request(app)
       .post(`/api/activities/${activityId}/volunteer`)
+      .set('Authorization', `Bearer ${token}`)
       .send(volunteerData)
       .expect(201);
 
     // Duplicate registration
     const response = await request(app)
       .post(`/api/activities/${activityId}/volunteer`)
+      .set('Authorization', `Bearer ${token}`)
       .send(volunteerData)
       .expect(409);
 
@@ -504,6 +516,7 @@ describe('Activity Controller - Register Volunteer', () => {
   test('should return 400 for invalid activity id', async () => {
     const response = await request(app)
       .post('/api/activities/invalid-id/volunteer')
+      .set('Authorization', `Bearer ${token}`)
       .send({ userId: '123', name: 'Test' })
       .expect(400);
 
@@ -516,7 +529,8 @@ describe('Activity Controller - Register Volunteer', () => {
     
     const response = await request(app)
       .post(`/api/activities/${fakeId}/volunteer`)
-      .send({ userId: '123', name: 'Test' })
+      .set('Authorization', `Bearer ${token}`)
+      .send({ userId: userId, name: 'Test' })
       .expect(404);
 
     expect(response.body).toHaveProperty('message', 'Activity not found');
@@ -541,7 +555,7 @@ describe('Activity Controller - Unregister Volunteer', () => {
       collectedVolunteer: 1,
       listVolunteer: [{
         _id: volunteerId,
-        userId: '507f1f77bcf86cd799439011',
+        userId: userId,
         name: 'John Volunteer',
         status: 'registered',
         createdAt: new Date()
@@ -555,6 +569,7 @@ describe('Activity Controller - Unregister Volunteer', () => {
   test('should unregister volunteer successfully', async () => {
     const response = await request(app)
       .delete(`/api/activities/${activityId}/volunteer/${volunteerId.toString()}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
     expect(response.body).toHaveProperty('message', 'Volunteer unregistered');
@@ -564,6 +579,7 @@ describe('Activity Controller - Unregister Volunteer', () => {
   test('should return 400 for invalid activity id', async () => {
     const response = await request(app)
       .delete(`/api/activities/invalid-id/volunteer/${volunteerId.toString()}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400);
 
     expect(response.body).toHaveProperty('message', 'Invalid id(s)');
@@ -572,6 +588,7 @@ describe('Activity Controller - Unregister Volunteer', () => {
   test('should return 400 for invalid volunteer id', async () => {
     const response = await request(app)
       .delete(`/api/activities/${activityId}/volunteer/invalid-id`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400);
 
     expect(response.body).toHaveProperty('message', 'Invalid id(s)');
@@ -583,6 +600,7 @@ describe('Activity Controller - Unregister Volunteer', () => {
     
     const response = await request(app)
       .delete(`/api/activities/${activityId}/volunteer/${fakeVolunteerId}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(404);
 
     expect(response.body).toHaveProperty('message', 'Activity or volunteer not found');
@@ -594,6 +612,7 @@ describe('Activity Controller - Unregister Volunteer', () => {
     
     const response = await request(app)
       .delete(`/api/activities/${fakeActivityId}/volunteer/${volunteerId.toString()}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(404);
 
     expect(response.body).toHaveProperty('message', 'Activity or volunteer not found');
