@@ -129,7 +129,7 @@ describe('Error Handler - validateActivityPayload', () => {
     const errors = validateActivityPayload({
       title: 'Test Activity',
       description: 'Test Description',
-      location: 'Test Location',
+      location: { name: 'Test Location', address: 'Test Address' },
       category: 'education',
       targetMoney: 1000000
     });

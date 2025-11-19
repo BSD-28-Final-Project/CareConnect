@@ -103,7 +103,7 @@ describe('Expense Controller - Create Expense', () => {
     expect(expense.amount).toBe(500000);
   });
 
-  test('should create expense without authentication (no auth required)', async () => {
+  test('should create expense with authentication', async () => {
     const expenseData = {
       activityId: activityId,
       title: 'Transportation Cost',
@@ -112,6 +112,7 @@ describe('Expense Controller - Create Expense', () => {
 
     const response = await request(app)
       .post('/api/expenses')
+      .set('Authorization', `Bearer ${token}`)
       .send(expenseData)
       .expect(201);
 

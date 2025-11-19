@@ -19,8 +19,8 @@ export function validateActivityPayload(body) {
     errors.push("title is required and must be a string");
   if (!body.description || typeof body.description !== "string")
     errors.push("description is required and must be a string");
-  if (body.location && typeof body.location !== "string")
-    errors.push("location must be a string");
+  if (body.location && (typeof body.location !== "object" || body.location === null))
+    errors.push("location must be an object");
   if (body.category && typeof body.category !== "string")
     errors.push("category must be a string");
   if (body.targetMoney && typeof body.targetMoney !== "number")
