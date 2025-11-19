@@ -25,7 +25,7 @@ export async function addPaymentMethod(req, res) {
     });
 
     await users.updateOne(
-      { _id: req.user.id },
+      { _id: new ObjectId(req.user._id) },
       { $set: { paymentMethodId: paymentMethod.id } }
     );
 
@@ -53,7 +53,7 @@ export async function createSubscription(req, res) {
     const subs = await getSubscriptionCollection();
     const activities = await getActivityCollection();
 
-    const user = await users.findOne({ _id: new ObjectId(req.user.id) });
+    const user = await users.findOne({ _id: new ObjectId(req.user._id) });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -84,7 +84,7 @@ export async function createSubscription(req, res) {
 
     // Save subscription to database
     await subs.insertOne({
-      userId: new ObjectId(req.user.id),
+      userId: new ObjectId(req.user._id),
       subscriptionId: newRecurring.id,
       amount,
       active: true,
@@ -116,7 +116,7 @@ export async function getSubscriptionDetails(req, res) {
   try {
     const subs = await getSubscriptionCollection();
     const data = await subs.findOne({ 
-      userId: new ObjectId(req.user.id), 
+      userId: new ObjectId(req.user._id), 
       active: true 
     });
     res.json(data || {});
@@ -132,7 +132,7 @@ export async function updateSubscriptionAmount(req, res) {
     const subs = await getSubscriptionCollection();
 
     const current = await subs.findOne({ 
-      userId: new ObjectId(req.user.id), 
+      userId: new ObjectId(req.user._id), 
       active: true 
     });
 
@@ -141,7 +141,7 @@ export async function updateSubscriptionAmount(req, res) {
     });
 
     await subs.updateOne(
-      { userId: new ObjectId(req.user.id) },
+      { userId: new ObjectId(req.user._id) },
       { $set: { amount: newAmount } }
     );
 
@@ -156,14 +156,14 @@ export async function cancelSubscription(req, res) {
   try {
     const subs = await getSubscriptionCollection();
     const current = await subs.findOne({ 
-      userId: new ObjectId(req.user.id), 
+      userId: new ObjectId(req.user._id), 
       active: true 
     });
 
     await xendit.RecurringPayment.disable(current.subscriptionId);
 
     await subs.updateOne(
-      { userId: new ObjectId(req.user.id) },
+      { userId: new ObjectId(req.user._id) },
       { $set: { active: false } }
     );
 
@@ -179,7 +179,7 @@ export async function getSubscriptionHistory(req, res) {
     const subs = await getSubscriptionCollection();
 
     const list = await subs
-      .find({ userId: new ObjectId(req.user.id) })
+      .find({ userId: new ObjectId(req.user._id) })
       .sort({ createdAt: -1 })
       .toArray();
 
@@ -292,7 +292,7 @@ export async function getSubscriptionDonations(req, res) {
 
     // Find active subscription
     const subscription = await subs.findOne({ 
-      userId: new ObjectId(req.user.id),
+      userId: new ObjectId(req.user._id),
       active: true 
     });
 

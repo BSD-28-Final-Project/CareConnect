@@ -96,7 +96,7 @@ describe('Donation Controller - Create Donation', () => {
     }
   });
 
-  test('should create donation without authentication (no auth required)', async () => {
+  test('should create donation with authentication', async () => {
     const donationData = {
       userId: userId,
       activityId: activityId,
@@ -106,6 +106,7 @@ describe('Donation Controller - Create Donation', () => {
 
     const response = await request(app)
       .post('/api/donations')
+      .set('Authorization', `Bearer ${token}`)
       .send(donationData);
 
     expect([201, 500]).toContain(response.status);
@@ -321,7 +322,8 @@ describe('Donation Controller - Get Donations', () => {
       .expect(200);
 
     expect(response.body).toHaveProperty('data');
-    expect(response.body).toHaveProperty('total', 3);
+    // Non-admin users only see their own donations (userId has 2 donations)
+    expect(response.body).toHaveProperty('total', 2);
     expect(Array.isArray(response.body.data)).toBe(true);
   });
 
@@ -331,7 +333,8 @@ describe('Donation Controller - Get Donations', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body).toHaveProperty('total', 2);
+    // Non-admin user only sees their own donations for this activity (1 donation)
+    expect(response.body).toHaveProperty('total', 1);
     expect(response.body.data.every(d => d.activityId.toString() === activityId)).toBe(true);
   });
 
@@ -373,7 +376,7 @@ describe('Donation Controller - Get Donations', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body).toHaveProperty('total', 3);
+    expect(response.body).toHaveProperty('total', 2);
   });
 });
 
@@ -424,9 +427,10 @@ describe('Donation Controller - Get Donation By ID', () => {
     expect(response.body).toHaveProperty('message', 'Invalid donation ID');
   });
 
-  test('should get donation without authentication (no auth required)', async () => {
+  test('should get donation with authentication', async () => {
     const response = await request(app)
       .get(`/api/donations/${donationId}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
     expect(response.body).toHaveProperty('data');
