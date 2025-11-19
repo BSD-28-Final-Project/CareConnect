@@ -140,7 +140,7 @@ export const getUserProfile = async (req, res, next) => {
 // Update user profile
 export const updateUserProfile = async (req, res, next) => {
   try {
-    const userId = req.user.id; // From JWT token
+    const userId = req.user._id; // From JWT token
     const { name, email, currentPassword, newPassword } = req.body;
 
     const collection = await getUserCollection();
