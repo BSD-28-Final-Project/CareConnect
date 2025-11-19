@@ -8,7 +8,9 @@ export const registerUser = async (req, res, next) => {
 
     // Validation
     if (!name || !email || !password) {
-      return res.status(400).json({ message: "Name, email, and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Name, email, and password are required" });
     }
 
     // Email validation
@@ -19,7 +21,9 @@ export const registerUser = async (req, res, next) => {
 
     // Password validation (minimal 5 characters)
     if (password.length < 5) {
-      return res.status(400).json({ message: "Password must be at least 5 characters long" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 5 characters long" });
     }
 
     const collection = await getUserCollection();
@@ -32,7 +36,7 @@ export const registerUser = async (req, res, next) => {
 
     // Hash password
     const hashed = await bcrypt.hash(password, 10);
-    
+
     const user = {
       name,
       email,
@@ -48,10 +52,10 @@ export const registerUser = async (req, res, next) => {
     };
 
     const result = await collection.insertOne(user);
-    
-    res.status(201).json({ 
+
+    res.status(201).json({
       message: "User registered successfully",
-      userId: result.insertedId
+      userId: result.insertedId,
     });
   } catch (err) {
     next(err);
@@ -64,7 +68,9 @@ export const loginUser = async (req, res, next) => {
 
     // Validation
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
     const collection = await getUserCollection();
@@ -82,25 +88,25 @@ export const loginUser = async (req, res, next) => {
 
     // Generate token
     const token = jwt.sign(
-      { 
-        _id: user._id.toString(), 
+      {
+        _id: user._id.toString(),
         email: user.email,
-        role: user.role 
-      }, 
-      process.env.JWT_SECRET, 
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    res.json({ 
-      message: "Login successful", 
+    res.json({
+      message: "Login successful",
       token,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
-        point: user.point
-      }
+        point: user.point,
+      },
     });
   } catch (err) {
     next(err);
@@ -112,7 +118,6 @@ export const getUserProfile = async (req, res, next) => {
   try {
     const userId = req.user._id; // From JWT token
     const collection = await getUserCollection();
-    
     const { ObjectId } = await import("mongodb");
     const user = await collection.findOne({ _id: new ObjectId(userId) });
 
@@ -125,7 +130,7 @@ export const getUserProfile = async (req, res, next) => {
 
     res.json({
       message: "Profile retrieved successfully",
-      user: userWithoutPassword
+      user: userWithoutPassword,
     });
   } catch (err) {
     next(err);
@@ -140,7 +145,6 @@ export const updateUserProfile = async (req, res, next) => {
 
     const collection = await getUserCollection();
     const { ObjectId } = await import("mongodb");
-    
     const user = await collection.findOne({ _id: new ObjectId(userId) });
 
     if (!user) {
@@ -148,7 +152,7 @@ export const updateUserProfile = async (req, res, next) => {
     }
 
     const updateData = {
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     // Update name if provided
@@ -168,9 +172,9 @@ export const updateUserProfile = async (req, res, next) => {
       }
 
       // Check if email already exists (for other users)
-      const existingUser = await collection.findOne({ 
-        email, 
-        _id: { $ne: new ObjectId(userId) } 
+      const existingUser = await collection.findOne({
+        email,
+        _id: { $ne: new ObjectId(userId) },
       });
 
       if (existingUser) {
@@ -183,18 +187,24 @@ export const updateUserProfile = async (req, res, next) => {
     // Update password if provided
     if (newPassword) {
       if (!currentPassword) {
-        return res.status(400).json({ message: "Current password is required to change password" });
+        return res
+          .status(400)
+          .json({ message: "Current password is required to change password" });
       }
 
       // Verify current password
       const valid = await bcrypt.compare(currentPassword, user.password);
       if (!valid) {
-        return res.status(400).json({ message: "Current password is incorrect" });
+        return res
+          .status(400)
+          .json({ message: "Current password is incorrect" });
       }
 
       // Validate new password
       if (newPassword.length < 5) {
-        return res.status(400).json({ message: "New password must be at least 5 characters long" });
+        return res
+          .status(400)
+          .json({ message: "New password must be at least 5 characters long" });
       }
 
       // Hash new password
@@ -217,7 +227,7 @@ export const updateUserProfile = async (req, res, next) => {
 
     res.json({
       message: "Profile updated successfully",
-      user: userWithoutPassword
+      user: userWithoutPassword,
     });
   } catch (err) {
     next(err);
@@ -229,9 +239,9 @@ export const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const collection = await getUserCollection();
-    
+
     const { ObjectId } = await import("mongodb");
-    
+
     // Validate ObjectId format
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid user ID format" });
@@ -253,7 +263,7 @@ export const getUserById = async (req, res, next) => {
 
     res.json({
       message: "User retrieved successfully",
-      user: userWithoutPassword
+      user: userWithoutPassword,
     });
   } catch (err) {
     next(err);
